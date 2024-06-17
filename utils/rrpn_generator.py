@@ -3,19 +3,19 @@ import os
 import sys
 import cv2
 import matplotlib
+import torch
 import matplotlib.pyplot as plt
 import pickle
 import numpy as np
 from PIL import Image
 from copy import deepcopy
-from detectron.utils.io import load_object
 
 def rrpn_loader(rpn_pkl_file):
     """
     Open, index and return a pickled proposals dictionary
     """
 
-    pkl = load_object(rpn_pkl_file)
+    pkl = torch.load(rpn_pkl_file)
     proposals = {}
     for boxes, scores, id in zip(pkl['boxes'], pkl['scores'], pkl['ids']):
         proposals[id] = {'boxes':boxes, 'scores':scores}
@@ -30,8 +30,8 @@ def get_im_proposals(point, sizes=(64, 128, 256, 512), aspect_ratios=(0.5, 1, 2)
     param: centered (str): 'center', 'bottom'
     """
     anchors = _generate_anchors(point,
-                                np.array(sizes, dtype=np.float),
-                                np.array(aspect_ratios, dtype=np.float),
+                                np.array(sizes, dtype=float),
+                                np.array(aspect_ratios, dtype=float),
                                 layout, 
                                 beta,
                                 include_depth=include_depth)
@@ -57,7 +57,7 @@ def _generate_anchors(point, sizes, aspect_ratios, layout, beta, include_depth):
     center = (point[0], point[1])
     anchor = np.array([center[0] - base_size/2.0, center[1] - base_size/2.0,
                        center[0] + base_size/2.0, center[1] + base_size/2.0],
-                      dtype=np.float)
+                      dtype=float)
 
     anchors = _ratio_enum(anchor, aspect_ratios)
     anchors = np.vstack(

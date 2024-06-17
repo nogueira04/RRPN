@@ -10,10 +10,10 @@ import argparse
 import sys
 import os
 import cv2
+import torch
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from detectron.utils.boxes import clip_boxes_to_image
-from detectron.utils.io import save_object
+from det2_port.utils import clip_boxes_to_image
 from cocoplus.coco import COCO_PLUS
 from rrpn_generator import get_im_proposals
 from visualization import draw_xyxy_bbox
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     out_dir = os.path.dirname(output_file)
     os.makedirs(out_dir, exist_ok=True)
 
-    ## Load the nucoco dataset
+    # Load the nucoco dataset
     coco = COCO_PLUS(args.ann_file)
 
     for img_id, img_info in tqdm(coco.imgs.items()):
@@ -66,7 +66,7 @@ if __name__ == '__main__':
         else:
             proposals = np.empty((0,4), np.float32)
 
-        ## Generate proposals for points in pointcloud
+        # Generate proposals for points in pointcloud
         pointcloud = coco.imgToPc[img_id]
         for point in pointcloud['points']:
             rois = get_im_proposals(point, 
@@ -77,26 +77,16 @@ if __name__ == '__main__':
                                     include_depth=args.include_depth)
             proposals = np.append(proposals, np.array(rois), axis=0)
                         
-        ## Clip the boxes to image boundaries
+        # Clip the boxes to image boundaries
         img_width = img_info['width']
         img_height = img_info['height']
-        proposals = clip_boxes_to_image(proposals, img_height, img_width)
-
-        # # Plot the proposal boxes
-        # img_path = os.path.join(args.imgs_dir, img_info['file_name'])
-        # img = cv2.imread(img_path)
-        # plotted_image = draw_xyxy_bbox(img, proposals.tolist(), lineWidth=2)
-        # plotted_image = cv2.cvtColor(plotted_image, cv2.COLOR_BGR2RGB)
-        # ax = plt.subplot(111)
-        # ax.imshow(plotted_image)
-        # save_fig('temp.pdf')
-        # input('here')
-        # plt.clf()
+        proposals = clip_boxes_to_image(proposals, (img_height, img_width))
 
         boxes.append(proposals)
         scores.append(np.zeros((proposals.shape[0]), dtype=np.float32))
         ids.append(img_id)
 
     print('Saving proposals to disk...')
-    save_object(dict(boxes=boxes, scores=scores, ids=ids), output_file)
+    # Save the object using PyTorch
+    torch.save(dict(boxes=boxes, scores=scores, ids=ids), output_file)
     print('Proposals saved to {}'.format(output_file))

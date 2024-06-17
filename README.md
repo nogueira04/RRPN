@@ -1,14 +1,5 @@
 # RRPN: Radar Region Proposal Network for Sensor Fusion in Autonomous Vehicles
 
-This is a fork of the original RRPN implementation, rewritten to support **Detectron v2** and **PyTorch 2.3.0**.
-
-## Changes Made
-
-The main changes in this fork are:
-
-- Upgraded the codebase to support **Detectron v2** instead of the previous version.
-- Updated the dependencies to work with **PyTorch 2.3.0**.
-
 ## Introduction
 
 
