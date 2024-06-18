@@ -11,9 +11,9 @@ CFG="$ROOT_DIR/configs/fast_rcnn_X-101-32x8d-FPN_1x_finetune_nucoco.yaml"
 TRAIN_WEIGHTS="$ROOT_DIR/data/models/X_101_32x8d_FPN_1x_original/model_final.pkl"
 OUT_DIR="$ROOT_DIR/data/models/X_101_32x8d_FPN_1x_nucoco"
 
-# Detectron2 doesn't use proposal files, so we don't need these lines
-# TRAIN_PROP_FILES="('$ROOT_DIR/data/nucoco/proposals/proposals_$TRAIN_SPLIT.pkl',)"
-# TEST_PROP_FILES="('$ROOT_DIR/data/nucoco/proposals/proposals_$VAL_SPLIT.pkl',)"
+# Specify the proposal files
+TRAIN_PROP_FILES="$ROOT_DIR/data/nucoco/proposals/proposals_$TRAIN_SPLIT.pkl"
+TEST_PROP_FILES="$ROOT_DIR/data/nucoco/proposals/proposals_$VAL_SPLIT.pkl"
 
 TRAIN_DATASETS="('nucoco_$TRAIN_SPLIT',)"
 TEST_DATASETS="('nucoco_$VAL_SPLIT',)"
@@ -32,7 +32,9 @@ python3 tools/train_net.py \
 OUTPUT_DIR $OUT_DIR \
 MODEL.WEIGHTS $TRAIN_WEIGHTS \
 DATASETS.TRAIN $TRAIN_DATASETS \
-DATASETS.TEST $TEST_DATASETS
+DATASETS.TEST $TEST_DATASETS \
+PROPOSAL_FILES_TRAIN $TRAIN_PROP_FILES \
+PROPOSAL_FILES_TEST $TEST_PROP_FILES
 
 echo "INFO: Done!"
 echo "-------------------------------------------------------------------------"

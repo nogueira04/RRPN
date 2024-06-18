@@ -7,7 +7,7 @@ SOLVER:
   IMS_PER_BATCH: 2
   BASE_LR: 0.0025
   MAX_ITER: 30000
-  STEPS: (0, 10000, 20000)
+  STEPS: (10000, 20000)
   GAMMA: 0.1
 DATASETS:
   TRAIN: ("nucoco_train",)
@@ -19,3 +19,6 @@ INPUT:
   MAX_SIZE_TEST: 1600
 TEST:
   EVAL_PERIOD: 5000
+
+PROPOSAL_FILES_TRAIN: "/home/live/RRPNv2/RRPN/data/nucoco/rrpn_proposals_train.pkl"
+PROPOSAL_FILES_TEST: "/home/live/RRPNv2/RRPN/data/nucoco/rrpn_proposals_val.pkl"
