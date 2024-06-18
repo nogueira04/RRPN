@@ -16,7 +16,7 @@ OUT_FILE="$ROOT_DIR/data/nucoco/proposals/proposals_${SPLIT}.pkl"
 echo "INFO: Creating proposals..."
 
 cd $ROOT_DIR/tools
-python generate_rrpn_proposals.py \
+python3 generate_rrpn_proposals.py \
   --ann_file $ANN_FILE \
   --imgs_dir $IMGS_DIR \
   --out_file $OUT_FILE \
