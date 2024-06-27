@@ -60,6 +60,7 @@ class NuscenesDataset(NuscenesDB):
         self.available_coordinates = ['vehicle', 'global']
         assert coordinates in self.available_coordinates, \
             'Coordinate system not available.'
+        print('split', split)
         assert split in _C.NUSCENES_SPLITS[nusc_version], \
             'Invalid split specified'
         assert pc_mode in ['camera', 'sample'], \

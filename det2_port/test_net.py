@@ -17,7 +17,7 @@ _DATASETS = {
     },
 }
 
-category_id_to_name = {1: "person", 2: "bicycle", 3: "car", 4: "motorcycle", 5: "bus", 6: "truck"}
+category_id_to_name = {0: "person", 1: "bicycle", 2: "car", 3: "motorcycle", 4: "bus", 5: "truck"}
 
 def register_datasets():
     for dataset_name, dataset_info in _DATASETS.items():
@@ -26,7 +26,6 @@ def register_datasets():
         # Set the metadata for the dataset (e.g., class names)
         MetadataCatalog.get(dataset_name).set(thing_classes=list(category_id_to_name.values()))
 
-# Register the datasets
 register_datasets()
 
 def parse_args():
@@ -92,7 +91,7 @@ def main(args):
     cfg.merge_from_file(args.cfg_file)
     print(f"Loaded configuration:\n{cfg}")
     cfg.MODEL.WEIGHTS = args.model_weights
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.1  # set the testing threshold for this model
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.0  # set the testing threshold for this model
     cfg.DATASETS.TEST = ("nucoco_mini_val", )
     predictor = DefaultPredictor(cfg)
     print("Created predictor.")

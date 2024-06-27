@@ -8,7 +8,7 @@ export CUDA_VISIBLE_DEVICES=0
 TRAIN_SPLIT='mini_train'
 VAL_SPLIT='mini_val'
 CFG="$ROOT_DIR/configs/fast_rcnn_X-101-32x8d-FPN_1x_finetune_nucoco.yaml"
-TRAIN_WEIGHTS="$ROOT_DIR/data/models/X_101_32x8d_FPN_1x_original/model_final.pkl"
+TRAIN_WEIGHTS="$ROOT_DIR/data/models/X-101-32x8d.pkl"
 OUT_DIR="$ROOT_DIR/data/models/X_101_32x8d_FPN_1x_nucoco"
 
 # Specify the proposal files

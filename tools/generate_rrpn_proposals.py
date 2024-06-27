@@ -1,9 +1,3 @@
-
-"""
-Script to generate object proposals from the Radar pointclouds in the nucoco
-dataset.
-"""
-
 import _init_path
 import numpy as np
 import argparse
@@ -18,7 +12,7 @@ from cocoplus.coco import COCO_PLUS
 from rrpn_generator import get_im_proposals
 from visualization import draw_xyxy_bbox
 from visualization import save_fig
-
+import pickle
 
 def parse_args():
     # Parse the input arguments
@@ -87,6 +81,7 @@ if __name__ == '__main__':
         ids.append(img_id)
 
     print('Saving proposals to disk...')
-    # Save the object using PyTorch
-    torch.save(dict(boxes=boxes, scores=scores, ids=ids), output_file)
+    # Save the object using pickle
+    with open(output_file, 'wb') as f:
+        pickle.dump(dict(boxes=boxes, scores=scores, ids=ids), f)
     print('Proposals saved to {}'.format(output_file))

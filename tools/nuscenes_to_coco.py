@@ -67,7 +67,7 @@ def main():
     
     ## Short split is used for filenames
     anns_file = os.path.join(args.out_dir, 'annotations', 'instances_' + args.split + '.json')
-
+    print("Creating COCO dataset for split: {}".format(nusc_version))
     nusc_dataset = NuscenesDataset(nusc_path=args.nusc_root, 
                                    nusc_version=nusc_version, 
                                    split=args.split,
