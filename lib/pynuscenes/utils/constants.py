@@ -63,7 +63,7 @@ DETECTION_NAMES = ['car', 'truck', 'bus', 'trailer', 'construction_vehicle', 'pe
                    'traffic_cone', 'barrier']
 
 COCO_CLASSES = {'pedestrian': {'id': 1, 'category': 'person', 'supercategory': 'person'},
-                'bicycle': {'id': 2, 'category': 'bicylce', 'supercategory': 'vehicle'},
+                'bicycle': {'id': 2, 'category': 'bicycle', 'supercategory': 'vehicle'},
                 'car': {'id': 3, 'category': 'car', 'supercategory': 'vehicle'},
                 'motorcycle': {'id': 4, 'category': 'motorcycle', 'supercategory': 'vehicle'},
                 'bus': {'id': 5, 'category': 'bus', 'supercategory': 'vehicle'},

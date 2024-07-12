@@ -4,6 +4,9 @@ import sys
 import pickle
 import numpy as np
 import argparse
+import cv2
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 from tqdm import tqdm, trange
 from cocoplus.coco import COCO_PLUS
 from pynuscenes.utils.nuscenes_utils import nuscenes_box_to_coco, nuscene_cat_to_coco
@@ -11,7 +14,6 @@ from pynuscenes.nuscenes_dataset import NuscenesDataset
 from nuscenes.utils.geometry_utils import view_points
 
 def parse_args():
-    # Parse the input arguments
     parser = argparse.ArgumentParser(description='Converts the NuScenes dataset to COCO format')
     
     parser.add_argument('--nusc_root', default='../data/nuscenes',
@@ -26,7 +28,7 @@ def parse_args():
     parser.add_argument('--nsweeps_radar', default=1, type=int,
                         help='Number of Radar sweeps to include')
 
-    parser.add_argument('--use_symlinks', default='False',
+    parser.add_argument('--use_symlinks', type=bool, default=False,
                         help='Create symlinks to nuScenes images rather than copying them')
 
     parser.add_argument('--cameras', nargs='+',
@@ -45,9 +47,29 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-#-------------------------------------------------------------------------------
+def showImgAnn(image, annotations, bbox_only=False, BGR=True, save_path=None):
+    if BGR:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    fig, ax = plt.subplots(1)
+    ax.imshow(image)
+
+    for ann in annotations:
+        bbox = ann['bbox']
+        if bbox_only:
+            rect = patches.Rectangle((bbox[0], bbox[1]), bbox[2], bbox[3], linewidth=1, edgecolor='r', facecolor='none')
+            ax.add_patch(rect)
+        else:
+            pass
+
+    if save_path:
+        plt.savefig(save_path)
+    else:
+        plt.show()
+
 def main():
     args = parse_args()
+    print(f"Parsed arguments: {args}")
 
     if "mini" in args.split:
         nusc_version = "v1.0-mini"
@@ -56,16 +78,14 @@ def main():
     else:
         nusc_version = "v1.0-trainval"
 
-    ## Categories: [category, supercategory, category_id]
     categories = [['person',      'person' ,  1],
-                  ['bicylce',     'vehicle',  2],
+                  ['bicycle',     'vehicle',  2],
                   ['car',         'vehicle',  3],
                   ['motorcycle',  'vehicle',  4],
                   ['bus',         'vehicle',  5],
                   ['truck',       'vehicle',  6]
     ]
     
-    ## Short split is used for filenames
     anns_file = os.path.join(args.out_dir, 'annotations', 'instances_' + args.split + '.json')
     print("Creating COCO dataset for split: {}".format(nusc_version))
     nusc_dataset = NuscenesDataset(nusc_path=args.nusc_root, 
@@ -80,73 +100,77 @@ def main():
     coco_dataset = COCO_PLUS(logging_level="INFO")
     coco_dataset.create_new_dataset(dataset_dir=args.out_dir, split=args.split)
 
-    ## add all category in order to have consistency between dataset splits
     for (coco_cat, coco_supercat, coco_cat_id) in categories:
         coco_dataset.addCategory(coco_cat, coco_supercat, coco_cat_id)
     
-    ## Get samples from the Nuscenes dataset
     num_samples = len(nusc_dataset)
     for i in trange(num_samples):
         sample = nusc_dataset[i]
         img_ids = sample['img_id']
 
-        for i, cam_sample in enumerate(sample['camera']):
+        for j, cam_sample in enumerate(sample['camera']):
             if cam_sample['camera_name'] not in args.cameras:
                 continue
 
-            img_id = int(img_ids[i])
+            img_id = int(img_ids[j])
             image = cam_sample['image']
-            pc = sample['radar'][i]
+            pc = sample['radar'][j]
             cam_cs_record = cam_sample['cs_record']
+
+            image = cv2.resize(image, (1600, 900))
             img_height, img_width, _ = image.shape
 
-            # Create annotation in coco_dataset format
             sample_anns = []
-            annotations = nusc_dataset.pc_to_sensor(sample['annotations'][i], 
+            annotations = nusc_dataset.pc_to_sensor(sample['annotations'][j], 
                                                     cam_cs_record)
-        
+
             for ann in annotations:
+                print(f"Annotation before conversion: {ann}")
+
                 coco_cat, coco_cat_id, coco_supercat = nuscene_cat_to_coco(ann.name)
-                ## if not a valid category, go to the next annotation
                 if coco_cat is None:
                     coco_dataset.logger.debug('Skipping ann with category: {}'.format(ann.name))
                     continue
-                
+
                 cat_id = coco_dataset.addCategory(coco_cat, coco_supercat, coco_cat_id)
-                bbox = nuscenes_box_to_coco(ann, np.array(cam_cs_record['camera_intrinsic']), 
-                                            (img_width, img_height))
+
+                print(f"Annotation: {ann}")
+                print(f"Camera intrinsic: {cam_cs_record['camera_intrinsic']}")
+                print(f"Image dimensions: {(img_width, img_height)}")
+
+                try:
+                    bbox = nuscenes_box_to_coco(ann, np.array(cam_cs_record['camera_intrinsic']), 
+                                                (img_width, img_height))
+                except Exception as e:
+                    print(f"Exception while computing bbox: {e}")
+                    bbox = None
+
+                if bbox is None:
+                    print(f"Failed to compute bbox for annotation: {ann}")
+                    continue
+
                 coco_ann = coco_dataset.createAnn(bbox, cat_id)
                 sample_anns.append(coco_ann)
 
-            ## Map the Radar pointclouds to image
             pc_cam = nusc_dataset.pc_to_sensor(pc, cam_cs_record)
             pc_depth = pc_cam[2, :]
             pc_image = view_points(pc_cam[:3, :], 
                                  np.array(cam_cs_record['camera_intrinsic']), 
                                  normalize=True)
             
-            ## Add the depth information to each point
             pc_coco = np.vstack((pc_image[:2,:], pc_depth))
             pc_coco = np.transpose(pc_coco).tolist()
 
-            ## Add sample to the COCO dataset
+            print(f"Saving image {img_id} to COCO dataset")
             coco_img_path = coco_dataset.addSample(img=image,
-                                           anns=sample_anns, 
-                                           pointcloud=pc_coco,
-                                           img_id=img_id,
-                                           other=cam_cs_record,
-                                           img_format='RGB',
-                                           write_img= not args.use_symlinks,
-                                           )
+                                                   anns=sample_anns, 
+                                                   pointcloud=pc_coco,
+                                                   img_id=img_id,
+                                                   other=cam_cs_record,
+                                                   img_format='RGB',
+                                                   write_img=True)
             
-            if args.use_symlinks:
-                try:
-                    os.symlink(os.path.abspath(cam_sample['cam_path']), coco_img_path)
-                except FileExistsError:
-                    pass
-            
-            ## Uncomment to visualize
-            # coco_dataset.showImgAnn(np.asarray(image), sample_anns, bbox_only=True, BGR=False)
+            showImgAnn(np.asarray(image), sample_anns, bbox_only=True, BGR=False, save_path=f"visualization_{img_id}.png")
         
     coco_dataset.saveAnnsToDisk()
 

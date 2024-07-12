@@ -113,11 +113,11 @@ def main(args):
         scale = max_dim / max(height, width)
         result = cv2.resize(result, None, fx=scale, fy=scale)
 
-        # Display the image
-        cv2.imshow('Inference', result)
-        # Wait for a key press and close the window
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # # Display the image
+        # cv2.imshow('Inference', result)
+        # # Wait for a key press and close the window
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
 
         cv2.imwrite(os.path.join(args.output_dir, d["file_name"]), result)
         print(f"Saved image to: {os.path.join(args.output_dir, d['file_name'])}")

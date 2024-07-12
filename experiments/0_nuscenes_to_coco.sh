@@ -6,9 +6,9 @@ ROOT_DIR="$(dirname "$CUR_DIR")"
 ##------------------------------------------------------------------------------
 ## Modify these parameters as needed
 
-NUSC_SPLIT='mini_train'
+NUSC_SPLIT='mini_val'
 NUM_RADAR_SWEEPS=1       # number of Radar sweeps
-USE_SYMLINKS='True'      # use symlinks instead of copying nuScenes images
+USE_SYMLINKS='False'      # use symlinks instead of copying nuScenes images
 
 ##------------------------------------------------------------------------------
 NUSC_DIR="$ROOT_DIR/data/nuscenes"
@@ -24,7 +24,7 @@ python3 nuscenes_to_coco.py \
   --split $NUSC_SPLIT \
   --out_dir $OUT_DIR \
   --nsweeps_radar $NUM_RADAR_SWEEPS \
-  --use_symlinks $USE_SYMLINKS \
+  --use_symlinks False
 
 
 echo "INFO: Done!"
