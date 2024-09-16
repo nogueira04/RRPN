@@ -102,9 +102,9 @@ def main(args):
     cfg.merge_from_file(args.cfg_file)
     print(f"Loaded configuration:\n{cfg}")
     cfg.MODEL.WEIGHTS = args.model_weights
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.1  # set the testing threshold for this model
-    cfg.MODEL.RETINANET.SCORE_THRESH_TEST = 0.1
-    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = 0.1
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.0  # set the testing threshold for this model
+    cfg.MODEL.RETINANET.SCORE_THRESH_TEST = 0.0
+    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = 0.0
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(category_id_to_name)
     cfg.DATASETS.TRAIN = ("nucoco_mini_train", )
     cfg.DATASETS.TEST = ("nucoco_mini_val", )
