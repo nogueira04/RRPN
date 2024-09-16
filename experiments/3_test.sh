@@ -10,7 +10,7 @@ export CUDA_VISIBLE_DEVICES=0
 MODEL_PKL="$ROOT_DIR/data/models/X_101_32x8d_FPN_1x_nucoco/model_final.pth"
 MODEL_CFG="$ROOT_DIR/data/models/faster_rcnn_R_101_FPN_3x.yaml"
 OUT_DIR="$ROOT_DIR/data/models/faster_rcnn_R_101_FPN_3x"
-DATASET="mini_val"
+DATASET="train"
 
 ##------------------------------------------------------------------------------
 TEST_PROP_FILES="$ROOT_DIR/data/nucoco/proposals/proposals_$DATASET.pkl"

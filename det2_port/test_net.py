@@ -11,17 +11,17 @@ import cv2
 
 # Dataset registration
 _DATASETS = {
-    'nucoco_mini_val': {
-        'img_dir': '/home/live/RRPNv2/RRPN/data/nucoco/mini_val',
-        'ann_file': '/home/live/RRPNv2/RRPN/data/nucoco/annotations/instances_mini_val.json',
+    'nucoco_val': {
+        'img_dir': '/clusterlivenfs/gnmp/RRPN/data/nucoco/val',
+        'ann_file': '/clusterlivenfs/gnmp/RRPN/data/nucoco/annotations/instances_val.json',
     },
-    'nucoco_mini_train': {
-        'img_dir': '/home/live/RRPNv2/RRPN/data/nucoco/mini_train',
-        'ann_file': '/home/live/RRPNv2/RRPN/data/nucoco/annotations/instances_mini_train.json',
+    'nucoco_train': {
+        'img_dir': '/clusterlivenfs/gnmp/RRPN/data/nucoco/train',
+        'ann_file': '/clusterlivenfs/gnmp/RRPN/data/nucoco/annotations/instances_train.json',
     },
 }
 
-category_id_to_name = {0: "person", 1: "bicycle", 2: "car", 3: "motorcycle", 4: "bus", 5: "truck"}
+category_id_to_name = {0: "_", 1: "person", 2: "bicycle", 3: "car", 4: "motorcycle", 5: "bus", 6: "truck"}
 
 def register_datasets():
     for dataset_name, dataset_info in _DATASETS.items():
@@ -30,6 +30,8 @@ def register_datasets():
         # Set the metadata for the dataset (e.g., class names)
         MetadataCatalog.get(dataset_name).set(thing_classes=list(category_id_to_name.values()))
 
+DatasetCatalog.clear()  # Clear any existing dataset registration
+MetadataCatalog.clear()  # Clear existing metadata
 register_datasets()
 
 def parse_args():
@@ -102,12 +104,12 @@ def main(args):
     cfg.merge_from_file(args.cfg_file)
     print(f"Loaded configuration:\n{cfg}")
     cfg.MODEL.WEIGHTS = args.model_weights
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.0  # set the testing threshold for this model
-    cfg.MODEL.RETINANET.SCORE_THRESH_TEST = 0.0
-    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = 0.0
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.1  # set the testing threshold for this model
+    cfg.MODEL.RETINANET.SCORE_THRESH_TEST = 0.1
+    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = 0.1
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(category_id_to_name)
-    cfg.DATASETS.TRAIN = ("nucoco_mini_train", )
-    cfg.DATASETS.TEST = ("nucoco_mini_val", )
+    cfg.DATASETS.TRAIN = ("nucoco_train", )
+    cfg.DATASETS.TEST = ("nucoco_val", )
 
     if not cfg.DATASETS.TRAIN:
         print("Warning: cfg.DATASETS.TRAIN is empty. Setting it to nucoco_mini_val.")
@@ -116,7 +118,11 @@ def main(args):
     predictor = DefaultPredictor(cfg)
     print("Created predictor.")
 
-    dataset_dicts = DatasetCatalog.get("nucoco_mini_val")
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
+        print(f"Created output directory: {args.output_dir}")
+
+    dataset_dicts = DatasetCatalog.get("nucoco_val")
     for d in dataset_dicts:
         print(f"Processing image: {d['file_name']}")
         im = cv2.imread(d["file_name"])
@@ -126,25 +132,26 @@ def main(args):
         outputs = predictor(im)
         print(f"Made predictions: {outputs}")
 
-        v = Visualizer(im[:, :, ::-1], MetadataCatalog.get("nucoco_mini_val"), scale=1.2)
+        v = Visualizer(im[:, :, ::-1], MetadataCatalog.get("nucoco_val"), scale=1.2)
         v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
         print("Drew predictions.")
         result = v.get_image()[:, :, ::-1]
 
         # Resize the image
-        max_dim = 800  # Maximum dimension for display
-        height, width = result.shape[:2]
-        scale = max_dim / max(height, width)
-        result = cv2.resize(result, None, fx=scale, fy=scale)
+        # max_dim = 800  # Maximum dimension for display
+        # height, width = result.shape[:2]
+        # scale = max_dim / max(height, width)
+        # result = cv2.resize(result, None, fx=scale, fy=scale)
 
         # Display the image
-        cv2.imshow('Inference', result)
+        #cv2.imshow('Inference', result)
         # Wait for a key press and close the window
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
 
-        # cv2.imwrite(os.path.join(args.output_dir, os.path.basename(d["file_name"])), result)
-        # print(f"Saved image to: {os.path.join(args.output_dir, os.path.basename(d['file_name'])}")
+        cv2.imwrite(os.path.join(args.output_dir, os.path.basename(d["file_name"])), result)
+        print(f"Saved image to: {os.path.join(args.output_dir, os.path.basename(d['file_name']))}")
+
 
 if __name__ == "__main__":
     args = parse_args()
