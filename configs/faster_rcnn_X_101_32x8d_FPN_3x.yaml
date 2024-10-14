@@ -1,0 +1,34 @@
+_BASE_: "Base-RCNN-FPN.yaml"
+MODEL:
+  MASK_ON: False
+  WEIGHTS: "detectron2://ImageNetPretrained/FAIR/X-101-32x8d.pkl"
+  PIXEL_STD: [57.375, 57.120, 58.395]
+  RESNETS:
+    STRIDE_IN_1X1: False  # this is a C2 model
+    NUM_GROUPS: 32
+    WIDTH_PER_GROUP: 8
+    DEPTH: 101
+# SOLVER:
+#   STEPS: (50000, 70000)
+#   MAX_ITER: 90000
+#   BASE_LR: 0.0001
+#   WEIGHT_DECAY: 0.000001
+
+SOLVER:
+  STEPS: (60000, 80000)      # Adjusted learning rate decay steps to smooth transitions
+  MAX_ITER: 100000           # Slightly increased maximum iterations for more gradual training
+  BASE_LR: 0.005           # Lowered base learning rate for more stable gradient updates
+  WEIGHT_DECAY: 0.0001       # Increased weight decay to prevent overfitting and reduce variability
+  LR_SCHEDULER_NAME: "WarmupCosineLR"  # Smoother learning rate schedule with cosine annealing
+  WARMUP_FACTOR: 0.001       # Factor for gradual warmup
+  WARMUP_ITERS: 1000         # Number of warmup iterations
+  WARMUP_METHOD: "linear"    # Linear warmup for smoother transition to base learning rate
+  CLIP_GRADIENTS:
+    ENABLED: True
+    CLIP_VALUE: 1.0          # Gradient clipping to stabilize gradient updates
+  IMS_PER_BATCH: 4          # Adjust batch size if needed (depends on your GPU memory)
+  OPTIMIZER: "AdamW"         # AdamW optimizer for more stable learning
+  MOMENTUM: 0.9              # Only used if switching back to SGD
+  WEIGHT_DECAY_NORM: 0.0001  # Optional additional regularization for norm layers
+  GAMMA: 0.1                 # Factor for reducing the learning rate at STEPS
+  SCHEDULER_STEPS: (60000, 80000)  # Ensure scheduler aligns with learning rate steps

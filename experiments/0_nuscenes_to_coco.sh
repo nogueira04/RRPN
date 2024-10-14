@@ -6,12 +6,12 @@ ROOT_DIR="$(dirname "$CUR_DIR")"
 ##------------------------------------------------------------------------------
 ## Modify these parameters as needed
 
-NUSC_SPLIT='mini_val'
+NUSC_SPLIT='val'
 NUM_RADAR_SWEEPS=1       # number of Radar sweeps
 USE_SYMLINKS='False'      # use symlinks instead of copying nuScenes images
 
 ##------------------------------------------------------------------------------
-NUSC_DIR="$ROOT_DIR/data/nuscenes"
+NUSC_DIR="/clusterlivenfs/shared_datasets/nuscenes"
 OUT_DIR="$ROOT_DIR/data/nucoco"
 # create symbolic link to the nucoco dataset for Detectron
 ln -s $ROOT_DIR/data/nucoco $ROOT_DIR/detectron/detectron/datasets/data/nucoco

@@ -5,11 +5,11 @@ ROOT_DIR="$(dirname "$CUR_DIR")"
 # Modify these parameters as needed
 export CUDA_VISIBLE_DEVICES=0
 
-TRAIN_SPLIT='mini_train'
-VAL_SPLIT='mini_val'
-CFG="$ROOT_DIR/configs/fast_rcnn_X-101-32x8d-FPN_1x_finetune_nucoco.yaml"
-TRAIN_WEIGHTS="$ROOT_DIR/data/models/X-101-32x8d.pkl"
-OUT_DIR="$ROOT_DIR/data/models/X_101_32x8d_FPN_1x_nucoco"
+TRAIN_SPLIT='train'
+VAL_SPLIT='val'
+CFG="$ROOT_DIR/configs/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
+TRAIN_WEIGHTS="$ROOT_DIR/data/models/model_final_68b088.pkl"
+OUT_DIR="$ROOT_DIR/data/models/faster_rcnn_X_101_32x8d_FPN_3x_nucoco_WD_02"
 
 # Specify the proposal files
 TRAIN_PROP_FILES="$ROOT_DIR/data/nucoco/proposals/proposals_$TRAIN_SPLIT.pkl"
@@ -33,8 +33,7 @@ OUTPUT_DIR $OUT_DIR \
 MODEL.WEIGHTS $TRAIN_WEIGHTS \
 DATASETS.TRAIN $TRAIN_DATASETS \
 DATASETS.TEST $TEST_DATASETS \
-PROPOSAL_FILES_TRAIN $TRAIN_PROP_FILES \
-PROPOSAL_FILES_TEST $TEST_PROP_FILES
+
 
 echo "INFO: Done!"
 echo "-------------------------------------------------------------------------"

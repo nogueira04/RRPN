@@ -7,10 +7,10 @@ ROOT_DIR="$(dirname "$CUR_DIR")"
 # Modify these parameters as needed
 
 export CUDA_VISIBLE_DEVICES=0
-MODEL_PKL="$ROOT_DIR/data/models/X_101_32x8d_FPN_1x_nucoco/model_final.pth"
-MODEL_CFG="$ROOT_DIR/data/models/faster_rcnn_R_101_FPN_3x.yaml"
-OUT_DIR="$ROOT_DIR/data/models/faster_rcnn_R_101_FPN_3x"
-DATASET="mini_val"
+MODEL_PKL="$ROOT_DIR/data/models/faster_rcnn_X_101_32x8d_FPN_3x_nucoco_WD_02/model_final.pth"
+MODEL_CFG="$ROOT_DIR/configs/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
+OUT_DIR="$ROOT_DIR/data/models/faster_rcnn_X_101_32x8d_FPN_3x_nucoco_WD_02/test_output"
+DATASET="val"
 
 ##------------------------------------------------------------------------------
 TEST_PROP_FILES="$ROOT_DIR/data/nucoco/proposals/proposals_$DATASET.pkl"
@@ -21,14 +21,9 @@ echo "INFO: Running inference... "
 cd $ROOT_DIR/det2_port
 python3 test_net.py \
     --cfg $MODEL_CFG \
-    --vis \
     --output-dir $OUT_DIR \
-    TEST.DATASETS "('nucoco_$DATASET',)" \
-    TEST.WEIGHTS $MODEL_PKL \
-    TEST.PROPOSAL_FILES "('$TEST_PROP_FILES',)" \
-    VIS True \
+    --model-weights $MODEL_PKL \
 
 echo "INFO: Results saved to: $OUT_DIR"
 echo "INFO: Done!"
 echo "-------------------------------------------------------------------------"
-

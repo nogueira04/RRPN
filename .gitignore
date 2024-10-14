@@ -9,9 +9,14 @@
 *.swp
 *.swo
 
+# venv
+/rrpn
+
 # Data folder
 data/*
 !data/README.md
+images/
+output/
 
 # Mac files
 **/.DS_Store

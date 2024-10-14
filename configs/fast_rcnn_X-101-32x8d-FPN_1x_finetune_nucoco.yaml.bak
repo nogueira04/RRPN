@@ -1,0 +1,30 @@
+MODEL:
+  WEIGHTS: "/clusterlivenfs/gnmp/RRPN/data/models/X-101-32x8d.pkl"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 101
+
+SOLVER:
+  WEIGHT_DECAY: 0.0001 # Adjust
+  LR_POLICY: steps_with_decay # Check if it's necessary
+  IMS_PER_BATCH: 6 
+  BASE_LR: 0.01
+  MAX_ITER: 30000
+  STEPS: (5000, 15000, 25000)
+  GAMMA: 0.1
+
+DATASETS:
+  TRAIN: ("nucoco_mini_train",)
+  TEST: ("nucoco_mini_val",)
+
+INPUT:
+  MIN_SIZE_TRAIN: (900,)
+  MAX_SIZE_TRAIN: 1600
+  MIN_SIZE_TEST: 900
+  MAX_SIZE_TEST: 1600
+
+TEST:
+  EVAL_PERIOD: 5000
+
+PROPOSAL_FILES_TRAIN: "/home/live/RRPNv2/RRPN/data/nucoco/proposals/proposals_mini_train.pkl"
+PROPOSAL_FILES_TEST: "/home/live/RRPNv2/RRPN/data/nucoco/proposals/proposals_mini_val.pkl"

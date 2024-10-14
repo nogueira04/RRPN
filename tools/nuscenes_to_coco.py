@@ -69,7 +69,7 @@ def showImgAnn(image, annotations, bbox_only=False, BGR=True, save_path=None):
 
 def main():
     args = parse_args()
-    print(f"Parsed arguments: {args}")
+    #print(f"Parsed arguments: {args}")
 
     if "mini" in args.split:
         nusc_version = "v1.0-mini"
@@ -87,7 +87,7 @@ def main():
     ]
     
     anns_file = os.path.join(args.out_dir, 'annotations', 'instances_' + args.split + '.json')
-    print("Creating COCO dataset for split: {}".format(nusc_version))
+    #print("Creating COCO dataset for split: {}".format(nusc_version))
     nusc_dataset = NuscenesDataset(nusc_path=args.nusc_root, 
                                    nusc_version=nusc_version, 
                                    split=args.split,
@@ -125,7 +125,7 @@ def main():
                                                     cam_cs_record)
 
             for ann in annotations:
-                print(f"Annotation before conversion: {ann}")
+                #print(f"Annotation before conversion: {ann}")
 
                 coco_cat, coco_cat_id, coco_supercat = nuscene_cat_to_coco(ann.name)
                 if coco_cat is None:
@@ -134,9 +134,9 @@ def main():
 
                 cat_id = coco_dataset.addCategory(coco_cat, coco_supercat, coco_cat_id)
 
-                print(f"Annotation: {ann}")
-                print(f"Camera intrinsic: {cam_cs_record['camera_intrinsic']}")
-                print(f"Image dimensions: {(img_width, img_height)}")
+                #print(f"Annotation: {ann}")
+                #print(f"Camera intrinsic: {cam_cs_record['camera_intrinsic']}")
+                #print(f"Image dimensions: {(img_width, img_height)}")
 
                 try:
                     bbox = nuscenes_box_to_coco(ann, np.array(cam_cs_record['camera_intrinsic']), 
@@ -161,7 +161,7 @@ def main():
             pc_coco = np.vstack((pc_image[:2,:], pc_depth))
             pc_coco = np.transpose(pc_coco).tolist()
 
-            print(f"Saving image {img_id} to COCO dataset")
+            #print(f"Saving image {img_id} to COCO dataset")
             coco_img_path = coco_dataset.addSample(img=image,
                                                    anns=sample_anns, 
                                                    pointcloud=pc_coco,
@@ -170,7 +170,7 @@ def main():
                                                    img_format='RGB',
                                                    write_img=True)
             
-            showImgAnn(np.asarray(image), sample_anns, bbox_only=True, BGR=False, save_path=f"visualization_{img_id}.png")
+            #showImgAnn(np.asarray(image), sample_anns, bbox_only=True, BGR=False, save_path=f"visualization_{img_id}.png")
         
     coco_dataset.saveAnnsToDisk()
 
