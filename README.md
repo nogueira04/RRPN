@@ -50,16 +50,16 @@ algorithm.
 
   ```bash
   cd ~
-  clone https://github.com/mrnabati/RRPN
-  cd rrpn
-  python -m pip install -r requirements.txt
+  git clone https://github.com/nogueira04/RRPN.git --recurse-submodules
+  cd RRPN/
+  pip install -r requirements.txt
   ```
 
-- Set up Detectron Python modules:
+- Set up Detectron 2 Python modules:
 
   ```bash
-  cd ~/rrpn/detectron 
-  make
+  cd RRPN/
+  python -m pip install -e detectron2
   ```
 
 - Download the NuScenes dataset from its [Download Page](https://www.nuscenes.org/download), 
