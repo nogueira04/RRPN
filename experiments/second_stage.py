@@ -12,7 +12,8 @@ from detectron2.structures import BoxMode
 
 # Load configuration and model
 cfg = get_cfg()
-cfg.merge_from_file("/clusterlivenfs/gnmp/RRPN/configs/faster_rcnn_X_101_32x8d_FPN_3x.yaml")
+cfg.merge_from_file("/clusterlivenfs/gnmp/RRPN/detectron2/configs/COCO-Detection/faster_rcnn_WideResNet_FPN.yaml")
+# cfg.merge_from_file("/clusterlivenfs/gnmp/RRPN/configs/faster_rcnn_X_101_32x8d_FPN_3x.yaml")
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  
 # cfg.MODEL.ROI_HEADS.NUM_CLASSES = 7
 model = build_model(cfg)
@@ -31,7 +32,7 @@ _DATASETS = {
 }
 
 # category_id_to_name = {0: "_", 1: "person", 2: "bicycle", 3: "car", 4: "motorcycle", 5: "bus", 6: "truck"}
-category_id_to_name = {0: "_", 1: "person", 2: "car", 3: "bicycle", 4: "motorcycle", 5: "bus", 6: "truck", 7: "_", 8: "_", 9: "_"}
+category_id_to_name = {0: "_", 1: "person", 2: "bicycle", 3: "car", 4: "motorcycle", 5: "bus", 6: "truck"}
 
 def register_datasets():
     for dataset_name, dataset_info in _DATASETS.items():
@@ -46,7 +47,8 @@ register_datasets()
 
 # Load the model weights
 checkpointer = DetectionCheckpointer(model)
-checkpointer.load("/clusterlivenfs/gnmp/RRPN/data/models/model_final_68b088.pkl")
+checkpointer.load("/clusterlivenfs/gnmp/RRPN/detectron2/output/wide_resnet_faster_rcnn/model_final.pth")
+# checkpointer.load("/clusterlivenfs/gnmp/RRPN/data/models/faster_rcnn_X_101_32x8d_FPN_3x_nucoco_best_trial_2/model_final.pth")
 
 # Load proposals from the proposal file
 with open("/clusterlivenfs/gnmp/RRPN/data/nucoco/proposals/proposals_val.pkl", 'rb') as f:

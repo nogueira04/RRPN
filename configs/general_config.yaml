@@ -1,0 +1,7 @@
+NUCOCO:
+  VAL:
+    IMG_DIR: "/clusterlivenfs/gnmp/RRPN/data/nucoco/val"
+    ANNOT_DIR: "/clusterlivenfs/gnmp/RRPN/data/nucoco/annotations/instances_val.json"
+  TRAIN:
+    IMG_DIR: "/clusterlivenfs/gnmp/RRPN/data/nucoco/train"
+    ANNOT_DIR: "/clusterlivenfs/gnmp/RRPN/data/nucoco/annotations/instances_train.json"

@@ -178,11 +178,7 @@ def nuscenes_box_to_coco(box, view, imsize, wlh_factor: float = 1.0, mode='xywh'
     :return: <np.float: 2, 4>. Corners of the 2D box
     """
     try:
-        # Log input parameters
-        print(f"Converting 3D box to 2D: box={box}, view={view}, imsize={imsize}, wlh_factor={wlh_factor}, mode={mode}")
-
         corner_2d = view_points(box.corners(), view, normalize=True)[:2]
-        print(f"Initial 2D corners: {corner_2d}")
 
         neighbor_map = {0: [1, 3, 4], 1: [0, 2, 5], 2: [1, 3, 6], 3: [0, 2, 7],
                         4: [0, 5, 7], 5: [1, 4, 6], 6: [2, 5, 7], 7: [3, 4, 6]}

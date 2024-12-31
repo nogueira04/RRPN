@@ -9,7 +9,7 @@ TRAIN_SPLIT='train'
 VAL_SPLIT='val'
 CFG="$ROOT_DIR/configs/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
 TRAIN_WEIGHTS="$ROOT_DIR/data/models/model_final_68b088.pkl"
-OUT_DIR="$ROOT_DIR/data/models/faster_rcnn_X_101_32x8d_FPN_3x_nucoco_WD_02"
+OUT_DIR="$ROOT_DIR/data/models/faster_rcnn_X_101_32x8d_FPN_3x_nucoco_40k_optuna"
 
 # Specify the proposal files
 TRAIN_PROP_FILES="$ROOT_DIR/data/nucoco/proposals/proposals_$TRAIN_SPLIT.pkl"

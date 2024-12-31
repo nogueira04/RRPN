@@ -5,6 +5,7 @@ import time
 import torch
 import pickle
 import cv2
+import yaml
 from detectron2.config import get_cfg
 from detectron2.modeling import build_model
 from detectron2.checkpoint import DetectionCheckpointer
@@ -13,15 +14,24 @@ from detectron2.data.datasets import load_coco_json
 from detectron2.structures import Boxes, Instances
 from detectron2.utils.visualizer import Visualizer
 
+root_dir = os.path.dirname(os.path.abspath(__file__))
+dataset_config_path = os.path.join(root_dir, "configs/general_config.yaml")
+dataset_config = None
+with open(dataset_config_path, "r") as f:
+    dataset_config = yaml.safe_load(f)
+
+val_config = dataset_config["NUCOCO"]["VAL"]
+train_config = dataset_config["NUCOCO"]["TRAIN"]
+
 # Dataset registration
 _DATASETS = {
     'nucoco_val': {
-        'img_dir': '/clusterlivenfs/gnmp/RRPN/data/nucoco/val',
-        'ann_file': '/clusterlivenfs/gnmp/RRPN/data/nucoco/annotations/instances_val.json',
+            'img_dir': val_config["IMG_DIR"],
+            'ann_file': val_config["ANNOT_DIR"],
     },
     'nucoco_train': {
-        'img_dir': '/clusterlivenfs/gnmp/RRPN/data/nucoco/train',
-        'ann_file': '/clusterlivenfs/gnmp/RRPN/data/nucoco/annotations/instances_train.json',
+        'img_dir': train_config["IMG_DIR"],
+        'ann_file': train_config["ANNOT_DIR"],
     },
 }
 
@@ -95,34 +105,18 @@ def main(args):
     checkpointer = DetectionCheckpointer(model)
     checkpointer.load(args.model_weights)
     print(cfg)
-    # Load proposals
     proposals = load_proposals("/clusterlivenfs/gnmp/RRPN/data/nucoco/proposals/proposals_val.pkl")
 
-    # Create output directory if not exists
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
 
-    # Process the dataset
     dataset_dicts = DatasetCatalog.get("nucoco_val")
     for d in dataset_dicts:
         image_path = d["file_name"]
         image_id = int(os.path.splitext(os.path.basename(image_path))[0])
         
-        # Perform inference
         outputs, image, proposal_boxes = perform_inference(image_path, image_id, model, proposals)
         
-        # # Save original image
-        # original_image_path = os.path.join(args.output_dir, f"original_{os.path.basename(image_path)}")
-        # cv2.imwrite(original_image_path, image)
-        
-        # # Visualize proposals
-        # v_proposals = Visualizer(image[:, :, ::-1], MetadataCatalog.get("nucoco_val"), scale=1.2)
-        # v_proposals = v_proposals.overlay_instances(boxes=proposal_boxes)
-        # proposal_image = v_proposals.get_image()[:, :, ::-1]
-        # proposals_save_path = os.path.join(args.output_dir, f"proposals_{os.path.basename(image_path)}")
-        # cv2.imwrite(proposals_save_path, proposal_image)
-        
-        # Visualize predictions
         v = Visualizer(image[:, :, ::-1], MetadataCatalog.get("nucoco_val"), scale=1.2)
         v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
         result = v.get_image()[:, :, ::-1]
