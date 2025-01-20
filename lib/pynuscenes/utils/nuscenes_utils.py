@@ -194,10 +194,6 @@ def nuscenes_box_to_coco(box, view, imsize, wlh_factor: float = 1.0, mode='xywh'
         ind_invisible = [i for i, x in enumerate(invisible) if x]
         corner_2d_visible = np.delete(corner_2d, ind_invisible, 1)
 
-        # Log visibility and invisibility
-        print(f"Visible corners: {corner_2d_visible}")
-        print(f"Invisible corners: {ind_invisible}")
-
         # Find intersections with boundary lines
         for ind in ind_invisible:
             invis_point = (corner_2d[0, ind], corner_2d[1, ind])
@@ -222,8 +218,6 @@ def nuscenes_box_to_coco(box, view, imsize, wlh_factor: float = 1.0, mode='xywh'
         x_min, y_min = np.amin(corner_2d_visible, axis=1)
         x_max, y_max = np.amax(corner_2d_visible, axis=1)
 
-        # Log computed min and max values
-        print(f"x_min: {x_min}, y_min: {y_min}, x_max: {x_max}, y_max: {y_max}")
 
         # Get the box corners
         corner_2d = np.array([[x_max, x_max, x_min, x_min],
@@ -237,8 +231,6 @@ def nuscenes_box_to_coco(box, view, imsize, wlh_factor: float = 1.0, mode='xywh'
         else:
             raise Exception("mode of '{}'' is not supported".format(mode))
 
-        # Log the final bounding box
-        print(f"Final COCO bounding box: {bbox}")
 
         return bbox
     except Exception as e:

@@ -6,7 +6,7 @@ ROOT_DIR="$(dirname "$CUR_DIR")"
 ##------------------------------------------------------------------------------
 ## Modify these parameters as needed
 
-NUSC_SPLIT='val'
+NUSC_SPLIT='train'
 NUM_RADAR_SWEEPS=1       # number of Radar sweeps
 USE_SYMLINKS='False'      # use symlinks instead of copying nuScenes images
 
@@ -27,9 +27,6 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 echo "INFO: Using NUSC_DIR=$NUSC_DIR, OUT_DIR=$OUT_DIR, NUSC_SPLIT=$NUSC_SPLIT"
-
-# create symbolic link to the nucoco dataset for Detectron
-ln -s $ROOT_DIR/data/nucoco $ROOT_DIR/detectron/detectron/datasets/data/nucoco
 
 echo "INFO: Converting nuScenes to COCO format..."
 

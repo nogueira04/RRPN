@@ -11,6 +11,7 @@ from detectron2.structures import Boxes, Instances
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
 from detectron2.data.datasets import load_coco_json
+import detectron2.modeling.backbone.wide_resnet
 
 category_id_to_name = {0: "_", 1: "person", 2: "bicycle", 3: "car", 4: "motorcycle", 5: "bus", 6: "truck"}
 
@@ -106,7 +107,7 @@ def main():
 
     root_dir = os.path.dirname(os.path.abspath(__file__))
     dataset_config_path = os.path.join(root_dir, "configs/general_config.yaml")
-    dataset_config = load_dataset_config(dataset_config_path)
+    dataset_config = load_dataset_config("/clusterlivenfs/gnmp/RRPN/configs/general_config.yaml")
     register_datasets(dataset_config)
 
     image_id = get_image_id(args.image_path)

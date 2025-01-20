@@ -12,6 +12,8 @@
 *.swp
 *.swo
 
+*.pkl
+
 # venv
 /rrpn
 

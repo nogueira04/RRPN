@@ -6,7 +6,7 @@ ROOT_DIR="$(dirname "$CUR_DIR")"
 ##------------------------------------------------------------------------------
 # Modify these parameters as needed
 
-SPLIT='val' # 'train' or 'val'
+SPLIT='train' # 'train' or 'val'
 
 ##------------------------------------------------------------------------------
 ANN_FILE="$ROOT_DIR/data/nucoco/annotations/instances_${SPLIT}.json"
