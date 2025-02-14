@@ -14,7 +14,16 @@ from detectron2.data.datasets import load_coco_json
 from detectron2.structures import Boxes, Instances
 from detectron2.utils.visualizer import Visualizer
 
-root_dir = os.path.dirname(os.path.abspath(__file__))
+current_path = os.path.dirname(os.path.abspath(__file__))
+
+while os.path.basename(current_path) != 'RRPN':
+    parent = os.path.dirname(current_path)
+    if parent == current_path:
+        raise RuntimeError("Couldn't find 'RRPN' in path hierarchy.")
+    current_path = parent
+
+root_dir = current_path
+
 dataset_config_path = os.path.join(root_dir, "configs/general_config.yaml")
 dataset_config = None
 with open(dataset_config_path, "r") as f:
