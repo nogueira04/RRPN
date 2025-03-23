@@ -18,7 +18,16 @@ from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.data import build_detection_test_loader
 from timer import Timer
 
-root_dir = os.path.dirname(os.path.abspath(__file__))
+current_path = os.path.dirname(os.path.abspath(__file__))
+
+while os.path.basename(current_path) != 'RRPN':
+    parent = os.path.dirname(current_path)
+    if parent == current_path:
+        raise RuntimeError("Couldn't find 'RRPN' in path hierarchy.")
+    current_path = parent
+
+root_dir = current_path
+
 dataset_config_path = os.path.join(root_dir, "configs/general_config.yaml")
 dataset_config_path = "/clusterlivenfs/gnmp/RRPN/configs/general_config.yaml"
 dataset_config = None
