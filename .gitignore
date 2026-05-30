@@ -64,6 +64,7 @@ det2_port/r*_rfdetr*/
 det2_port/x*_rf*output*/
 tools/ann_imgs/
 tools/old_output/
+tools/scene_descriptions.txt
 tools/viz_pairs/
 tools/predictions*.jpg
 tools/viz_pairs.log
