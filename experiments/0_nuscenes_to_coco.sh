@@ -6,14 +6,14 @@ ROOT_DIR="$(dirname "$CUR_DIR")"
 ##------------------------------------------------------------------------------
 ## Modify these parameters as needed
 
-NUSC_SPLIT='train'
-NUM_RADAR_SWEEPS=1       # number of Radar sweeps
-USE_SYMLINKS='False'      # use symlinks instead of copying nuScenes images
+NUSC_SPLIT="${NUSC_SPLIT:-val}"
+NUM_RADAR_SWEEPS="${NUM_RADAR_SWEEPS:-1}"       # number of Radar sweeps
+PYTHON="${PYTHON:-python3}"
 
 ##------------------------------------------------------------------------------
 
-NUSC_DIR="/clusterlivenfs/shared_datasets/nuscenes"
-OUT_DIR="$ROOT_DIR/data/nucoco"
+NUSC_DIR="${NUSC_DIR:-/clusterlivenfs/shared_datasets/nuscenes}"
+OUT_DIR="${OUT_DIR:-$ROOT_DIR/data/nucoco}"
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -21,23 +21,24 @@ while [[ "$#" -gt 0 ]]; do
         --nusc_dir) NUSC_DIR="$2"; shift ;;
         --out_dir) OUT_DIR="$2"; shift ;;
         --split) NUSC_SPLIT="$2"; shift ;;
+        --nsweeps_radar) NUM_RADAR_SWEEPS="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
     shift
 done
 
-echo "INFO: Using NUSC_DIR=$NUSC_DIR, OUT_DIR=$OUT_DIR, NUSC_SPLIT=$NUSC_SPLIT"
+echo "INFO: Using NUSC_DIR=$NUSC_DIR, OUT_DIR=$OUT_DIR, NUSC_SPLIT=$NUSC_SPLIT, NUM_RADAR_SWEEPS=$NUM_RADAR_SWEEPS"
 
 echo "INFO: Converting nuScenes to COCO format..."
 
-cd $ROOT_DIR/tools
-python3 nuscenes_to_coco.py \
-  --nusc_root $NUSC_DIR \
-  --split $NUSC_SPLIT \
-  --out_dir $OUT_DIR \
-  --nsweeps_radar $NUM_RADAR_SWEEPS \
-  --use_symlinks False
-
+cd "$ROOT_DIR/tools"
+"$PYTHON" nuscenes_to_coco.py \
+  --nusc_root "$NUSC_DIR" \
+  --split "$NUSC_SPLIT" \
+  --out_dir "$OUT_DIR" \
+  --nsweeps_radar "$NUM_RADAR_SWEEPS"
+  # --use_symlinks False \
+  # --keyword_splits "night"
 
 echo "INFO: Done!"
 echo "-------------------------------------------------------------------------"
