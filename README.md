@@ -69,7 +69,6 @@ training annotations: `B` for Base and `L` for Large.
 | `tools/nuscenes_to_coco_rfdetr.py` | Generates RF-DETR pseudo-label annotations for the data-centric supervision setup. |
 | `tools/generate_rrpn_proposals_orig.py` | Generates RRPN proposal pickle files from projected radar points. |
 | `det2_port/test_net.py` | Main Detectron2 evaluation entry point using precomputed RRPN proposals. |
-| `det2_port/run_conditional_inference.py` | Scene-conditional evaluation entry point for night/rain/other subsets. |
 | `configs/` | Detectron2 model configs for the backbones used in the experiments. |
 | `experiments/` | Shell wrappers for conversion, proposal generation, training, and evaluation. |
 | `detectron2/` | Project-specific Detectron2 fork used by this release. |
@@ -88,19 +87,19 @@ the official site and comply with the nuScenes terms of use:
 The RF-DETR-generated derived annotations and RRPN proposal pickles are released
 as a Google Drive artifact:
 
-- Folder: `rrpn-vtc2026-rfdetr-v1`
-- Drive folder: https://drive.google.com/drive/folders/1Xy1hnsMNx-3mfNViNG3bVzsFb4rKb-VW
-- Archive: `rrpn-vtc2026-rfdetr-v1.tar.gz`
-- Archive link: https://drive.google.com/file/d/11YrGgGHv3AhsDYjyVn9f0jjDI9wO64xw/view
+- Folder: `rrpn-vtc2026-rfdetr-paper-v1`
+- Drive folder: https://drive.google.com/drive/folders/137VNmiiPKEuN5QkWeL3HVyvYNqwZZIQa
+- Archive: `rrpn-vtc2026-rfdetr-paper-v1.tar.gz`
+- Archive link: https://drive.google.com/file/d/1zqFORB2xo0QnSzEOTvmDGBBDP-WhPkcO/view
 - Archive SHA-256:
-  `7384b02642c7a7000c3adbc90be90836f571c8f70e6e966bcd454aff03976cd7`
+  `af7a717315916dee5a4d52545a3abed575445d2a2fec06733d751f1bb31ee497`
 - Access: request access from the repository maintainer if the Drive link is
   restricted.
 
 Expected release layout:
 
 ```text
-rrpn-vtc2026-rfdetr-v1/
+rrpn-vtc2026-rfdetr-paper-v1/
   rfdetr-base/
     annotations/instances_train.json
     annotations/instances_val.json
@@ -111,15 +110,6 @@ rrpn-vtc2026-rfdetr-v1/
     annotations/instances_val.json
     proposals/proposals_train.pkl
     proposals/proposals_val.pkl
-  conditional-eval/
-    annotations/
-      instances_val_night.json
-      instances_val_rain.json
-      instances_val_not_rain_and_night.json
-      instances_val_turn.json
-      instances_val_vis20.json
-    metadata/
-      id_to_scene_val.pkl
   FILELIST.tsv
   MANIFEST.sha256
   DATASET_CARD.md
@@ -130,9 +120,9 @@ checkpoints, model weights, TensorBoard logs, and generated visualization folder
 Validate the downloaded archive and extracted package with:
 
 ```bash
-sha256sum rrpn-vtc2026-rfdetr-v1.tar.gz
-tar -xzf rrpn-vtc2026-rfdetr-v1.tar.gz
-cd rrpn-vtc2026-rfdetr-v1
+sha256sum rrpn-vtc2026-rfdetr-paper-v1.tar.gz
+tar -xzf rrpn-vtc2026-rfdetr-paper-v1.tar.gz
+cd rrpn-vtc2026-rfdetr-paper-v1
 sha256sum -c MANIFEST.sha256
 ```
 
@@ -228,8 +218,6 @@ python test_net.py \
   in the paper's per-class AP table.
 - Full training is expensive and writes checkpoints and logs. Use explicit output
   directories and avoid broad `git add` commands.
-- Scene-conditional evaluation requires matching split annotations, scene metadata,
-  and proposal files.
 
 ## Citation
 
