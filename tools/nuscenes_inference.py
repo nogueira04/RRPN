@@ -11,6 +11,7 @@ from detectron2.structures import Boxes, Instances
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
 from detectron2.data.datasets import load_coco_json
+from utils.timer import Timer
 import detectron2.modeling.backbone.wide_resnet
 
 category_id_to_name = {0: "_", 1: "person", 2: "bicycle", 3: "car", 4: "motorcycle", 5: "bus", 6: "truck"}
@@ -86,55 +87,56 @@ def perform_inference(image_path, image_id, proposals, proposal_ids, id_to_index
 
     return outputs, image, proposal_boxes
 
+
 def main():
     args = parse_arguments()
+    timer = Timer()
 
-    cfg = get_cfg()
-    cfg.merge_from_file(args.config_file)
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
+    with timer.time("Load Model Configuration"):
+        cfg = get_cfg()
+        cfg.merge_from_file(args.config_file)
+        cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
 
-    model = build_model(cfg)
-    model.eval()
+    with timer.time("Build and Load Model"):
+        model = build_model(cfg)
+        model.eval()
+        checkpointer = DetectionCheckpointer(model)
+        checkpointer.load(args.weights_file)
 
-    checkpointer = DetectionCheckpointer(model)
-    checkpointer.load(args.weights_file)
+    with timer.time("Load Proposals"):
+        with open(args.proposals_file, 'rb') as f:
+            proposals = pickle.load(f)
+        proposal_ids = set(proposals['ids'])
+        id_to_index = {img_id: idx for idx, img_id in enumerate(proposals['ids'])}
 
-    with open(args.proposals_file, 'rb') as f:
-        proposals = pickle.load(f)
+    with timer.time("Register Datasets"):
+        dataset_config = load_dataset_config("/clusterlivenfs/gnmp/RRPN/configs/general_config.yaml")
+        register_datasets(dataset_config)
 
-    proposal_ids = set(proposals['ids'])
-    id_to_index = {img_id: idx for idx, img_id in enumerate(proposals['ids'])}
-
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    dataset_config_path = os.path.join(root_dir, "configs/general_config.yaml")
-    dataset_config = load_dataset_config("/clusterlivenfs/gnmp/RRPN/configs/general_config.yaml")
-    register_datasets(dataset_config)
-
-    image_id = get_image_id(args.image_path)
-    outputs, image, proposal_boxes = perform_inference(
-        args.image_path, image_id, proposals, proposal_ids, id_to_index, model
-    )
+    with timer.time("Perform Inference"):
+        image_id = get_image_id(args.image_path)
+        outputs, image, proposal_boxes = perform_inference(
+            args.image_path, image_id, proposals, proposal_ids, id_to_index, model
+        )
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    if args.debug:
-        original_image_path = os.path.join(args.output_dir, "original_image.jpg")
-        cv2.imwrite(original_image_path, cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
-        print(f"Original image saved at: {original_image_path}")
+    with timer.time("Save Outputs"):
+        if args.debug:
+            original_image_path = os.path.join(args.output_dir, "original_image.jpg")
+            cv2.imwrite(original_image_path, cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
 
-        proposals_image = draw_proposals(image.copy(), proposal_boxes)
-        proposals_image_path = os.path.join(args.output_dir, "proposals_image.jpg")
-        cv2.imwrite(proposals_image_path, cv2.cvtColor(proposals_image, cv2.COLOR_RGB2BGR))
-        print(f"Proposals image saved at: {proposals_image_path}")
+            proposals_image = draw_proposals(image.copy(), proposal_boxes)
+            proposals_image_path = os.path.join(args.output_dir, "proposals_image.jpg")
+            cv2.imwrite(proposals_image_path, cv2.cvtColor(proposals_image, cv2.COLOR_RGB2BGR))
 
-    v = Visualizer(image, MetadataCatalog.get("nucoco_val"), scale=1.2)
-    out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+        v = Visualizer(image, MetadataCatalog.get("nucoco_val"), scale=1.2)
+        out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+        output_image = out.get_image()[:, :, ::-1]
+        predictions_path = os.path.join(args.output_dir, "predictions.jpg")
+        cv2.imwrite(predictions_path, output_image)
 
-    output_image = out.get_image()[:, :, ::-1]
-    predictions_path = os.path.join(args.output_dir, "predictions.jpg")
-    cv2.imwrite(predictions_path, output_image)
-
-    print(f"Predictions image saved at: {predictions_path}")
+    timer.print_summary()
 
 if __name__ == "__main__":
     main()
