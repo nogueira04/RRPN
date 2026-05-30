@@ -1,7 +1,10 @@
 **/__pycache__
+*.py[cod]
 
 *.out
+*.log
 *.sqlite3
+*.sqlite
 
 # Editor specific files
 /.vscode
@@ -12,16 +15,58 @@
 *.swp
 *.swo
 
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+
+# Python environments
+.venv/
+venv/
+
+# Large model and generated artifacts
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.engine
+*.dlc
+*.bin
+*.npy
+*.npz
+*.mat
 *.pkl
+events.out.tfevents.*
+*.tfevents*
 
 # venv
 /rrpn
+/rrpnv2/
 
 # Data folder
 data/*
 !data/README.md
 images/
 output/
+outputs/
+runs/
+wandb/
+mlruns/
+checkpoints/
+
+# Generated experiment and visualization outputs
+experiments/finetune_*
+experiments/rfdetr_large_x101
+detectron2/output/
+det2_port/inf_*/
+det2_port/*_output*/
+det2_port/r*_rfdetr*/
+det2_port/x*_rf*output*/
+tools/ann_imgs/
+tools/old_output/
+tools/viz_pairs/
+tools/predictions*.jpg
+tools/viz_pairs.log
 
 # Mac files
 **/.DS_Store
