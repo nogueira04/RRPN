@@ -139,7 +139,8 @@ class NuscenesDataset(NuscenesDB):
             'annotations': [],
             'ego_pose': frame['ego_pose'],
             'img_id': [],
-            'id': frame['id']
+            'id': frame['id'],
+            'scene_token': frame['scene_token']
         }
         for i, relevant_camera in enumerate(frame['camera']):
             self.logger.debug('Processing camera: {}'.format(relevant_camera['camera_name']))
@@ -175,6 +176,8 @@ class NuscenesDataset(NuscenesDB):
         :return sensor_data: dictionary containing all sensor data for that frame
         """
         frame = self.db['frames'][idx]
+
+
         sensor_data = {
             "lidar": {
                 "points": None,
@@ -194,12 +197,13 @@ class NuscenesDataset(NuscenesDB):
             },
             "annotations": None,
             "ego_pose": None,
-            "id": frame["id"]
+            "id": frame["id"],
+            "scene_token": None
         }
-        
+
         ## Get sample and ego pose data
         lidar_sample_data = self.nusc.get('sample_data', 
-                                          frame['sample']['LIDAR_TOP'])
+                            frame['sample']['LIDAR_TOP'])
         sample_token = lidar_sample_data['sample_token']
         sample_rec = self.nusc.get('sample', sample_token)
         ego_pose_token = lidar_sample_data['ego_pose_token']
@@ -207,6 +211,7 @@ class NuscenesDataset(NuscenesDB):
         sensor_data['ego_pose'] = {'translation': pose_rec['translation'], 
                                    'rotation': pose_rec['rotation']}
 
+        sensor_data['scene_token'] = sample_rec['scene_token']
         ## TODO: return numpy arrays for pointclouds to match get_sensor_data_by_sample
         ## Get LIDAR data
         if 'lidar' in self.sensors_to_return:
